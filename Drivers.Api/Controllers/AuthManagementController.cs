@@ -53,12 +53,12 @@ public class AuthManagementController : ControllerBase
 
         if (isCreated.Succeeded)
         {
-            // TODO: Create a JWT Token
+            var token = GenerateJwtToken(newUser);
 
             return await Task.FromResult(Ok(new RegistrationRequestResponse()
             {
                 Result = true,
-                Token = ""
+                Token = token
             }));
         }
 
