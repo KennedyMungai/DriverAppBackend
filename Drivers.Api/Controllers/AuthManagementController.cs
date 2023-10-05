@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Drivers.Api.Configurations;
@@ -7,11 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Drivers.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class AuthManagementController : ControllerBase
 {
     private readonly UserManager<IdentityUser> _userManager;
