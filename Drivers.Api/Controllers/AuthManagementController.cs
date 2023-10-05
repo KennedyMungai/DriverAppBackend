@@ -45,6 +45,7 @@ public class AuthManagementController : ControllerBase
 
         var newUser = new IdentityUser()
         {
+            UserName = requestDto.Email,
             Email = requestDto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(requestDto.Password)
         };
@@ -58,11 +59,12 @@ public class AuthManagementController : ControllerBase
             return await Task.FromResult(Ok(new RegistrationRequestResponse()
             {
                 Result = true,
-                Token = token
+                Token = token,
+                Errors = new List<string>()
             }));
         }
 
-        return await Task.FromResult(BadRequest("Had an error creating the user"));
+        return await Task.FromResult(BadRequest(isCreated.Errors.Select(x => x.Description).ToList()));
     }
 
     private string GenerateJwtToken(IdentityUser user)
