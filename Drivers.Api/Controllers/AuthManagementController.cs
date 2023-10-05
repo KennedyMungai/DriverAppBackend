@@ -1,8 +1,12 @@
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 using Drivers.Api.Configurations;
 using Drivers.Api.Models.Dtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace Drivers.Api.Controllers;
 
@@ -59,5 +63,29 @@ public class AuthManagementController : ControllerBase
         }
 
         return await Task.FromResult(BadRequest("Had an error creating the user"));
+    }
+
+    private string GenerateJwtToken(IdentityUser user)
+    {
+        var jwtTokenHandler = new JwtSecurityTokenHandler();
+
+        var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+
+        var tokenDescriptor = new SecurityTokenDescriptor()
+        {
+            Subject = new ClaimsIdentity(new[] {
+                new Claim("Id", user.Id),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            }),
+            Expires = DateTime.UtcNow.AddHours(4),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512)
+        };
+
+        var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+        var jwtToken = jwtTokenHandler.WriteToken(token);
+
+        return jwtToken;
     }
 }
