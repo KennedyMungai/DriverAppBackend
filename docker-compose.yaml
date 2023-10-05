@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  DriversDb:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=Password1!
+      - MYSQL_DB=DriversDb
+    ports:
+      - "3310:3306"
