@@ -79,12 +79,12 @@ public class AuthManagementController : ControllerBase
 
         var existingUser = await _userManager.FindByEmailAsync(requestDto.Email);
 
-        if (existingUser is null && !BCrypt.Net.BCrypt.Verify(requestDto.Password, existingUser?.PasswordHash))
+        if (existingUser is null && (BCrypt.Net.BCrypt.Verify(requestDto.Password, existingUser?.PasswordHash) == false))
         {
             return await Task.FromResult(Forbid("Invalid Credentials"));
         }
 
-        var token = GenerateJwtToken(existingUser);
+        var token = GenerateJwtToken(existingUser!);
 
         return await Task.FromResult(Ok(new LoginRequestResponse()
         {
