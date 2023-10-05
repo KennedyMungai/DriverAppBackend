@@ -67,6 +67,9 @@ public class AuthManagementController : ControllerBase
     }
 
     [HttpPost("Login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Login([FromBody] UserLoginRequestDto requestDto)
     {
         if (!ModelState.IsValid)
