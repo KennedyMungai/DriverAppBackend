@@ -59,12 +59,35 @@ public class AuthManagementController : ControllerBase
             return await Task.FromResult(Ok(new RegistrationRequestResponse()
             {
                 Result = true,
-                Token = token,
-                Errors = new List<string>()
+                Token = token
             }));
         }
 
         return await Task.FromResult(BadRequest(isCreated.Errors.Select(x => x.Description).ToList()));
+    }
+
+    [HttpPost("Login")]
+    public async Task<IActionResult> Login([FromBody] UserLoginRequestDto requestDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return await Task.FromResult(BadRequest("Invalid Request Payload"));
+        }
+
+        var existingUser = await _userManager.FindByEmailAsync(requestDto.Email);
+
+        if (existingUser is null && !BCrypt.Net.BCrypt.Verify(requestDto.Password, existingUser?.PasswordHash))
+        {
+            return await Task.FromResult(Forbid("Invalid Credentials"));
+        }
+
+        var token = GenerateJwtToken(existingUser);
+
+        return await Task.FromResult(Ok(new LoginRequestResponse()
+        {
+            Token = token,
+            Result = true
+        }));
     }
 
     private string GenerateJwtToken(IdentityUser user)
